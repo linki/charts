@@ -1,0 +1,21 @@
+name: drone
+
+drone:
+  image: drone/drone
+  imageTag: 0.5
+  open: true
+  admin: foo
+  secret: redacted
+
+replicas:
+  server: 1
+  agent: 1
+
+persistence:
+  enabled: false
+
+github:
+  enabled: true
+  client_id: redacted
+  client_secret: redacted
+  scope: public_repo,repo:status,user:email

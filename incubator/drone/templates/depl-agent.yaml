@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s-agent" .Release.Name .Values.name }}
+  labels:
+    app: {{ printf "%s-agent" .Values.name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicas.agent }}
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-agent" .Values.name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      containers:
+      - name: agent
+        image: {{ .Values.drone.image }}:{{ .Values.drone.imageTag }}
+        args:
+        - agent
+        env:
+        - name: DRONE_SERVER
+          value: {{ printf "ws://%s-%s-server/ws/broker" .Release.Name .Values.name }}
+        - name: DRONE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ printf "%s-%s-config" .Release.Name .Values.name }}
+              key: drone.secret
+        volumeMounts:
+        - name: docker
+          mountPath: /var/run/docker.sock
+      volumes:
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock
