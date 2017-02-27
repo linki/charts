@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s-server" .Release.Name .Values.name }}
+  labels:
+    app: {{ printf "%s-server" .Values.name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicas.server }}
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-server" .Values.name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      containers:
+      - name: server
+        image: {{ .Values.drone.image }}:{{ .Values.drone.imageTag }}
+        env:
+        - name: DRONE_OPEN
+          value: {{ .Values.drone.open | quote }}
+        - name: DRONE_ADMIN
+          value: {{ .Values.drone.admin }}
+        - name: DRONE_GITHUB
+          value: {{ .Values.github.enabled | quote }}
+        - name: DRONE_GITHUB_SCOPE
+          value: {{ .Values.github.scope }}
+        - name: DRONE_GITHUB_CLIENT
+          valueFrom:
+            secretKeyRef:
+              name: {{ printf "%s-%s-config" .Release.Name .Values.name }}
+              key: github.client_id
+        - name: DRONE_GITHUB_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ printf "%s-%s-config" .Release.Name .Values.name }}
+              key: github.client_secret
+        - name: DRONE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ printf "%s-%s-config" .Release.Name .Values.name }}
+              key: drone.secret
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - mountPath: /var/lib/drone
+          name: data
+      volumes:
+      {{- if .Values.persistence.enabled}}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ printf "%s-%s-data" .Release.Name .Values.name }}
+      {{- else }}
+      - name: data
+        emptyDir: {}
+      {{- end }}
