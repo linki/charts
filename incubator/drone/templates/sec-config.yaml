@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ printf "%s-%s-config" .Release.Name .Values.name }}
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+type: Opaque
+data:
+  {{ if .Values.github.client_id -}}
+  github.client_id: {{ .Values.github.client_id | b64enc }}
+  {{ end -}}
+  {{ if .Values.github.client_secret -}}
+  github.client_secret: {{ .Values.github.client_secret | b64enc }}
+  {{ end -}}
+  {{ if .Values.drone.secret -}}
+  drone.secret: {{ .Values.drone.secret | b64enc }}
+  {{ else -}}
+  drone.secret: {{ randAlphaNum 10 | b64enc }}
+  {{ end -}}

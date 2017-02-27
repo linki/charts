@@ -1,0 +1,10 @@
+name: drone
+version: 0.5.0
+description: drone
+home: https://github.com/drone/drone
+sources:
+- https://github.com/done/drone
+maintainers:
+- name: Martin Linkhorst
+  email: linki+kubernetes.io@posteo.de
+engine: gotpl
