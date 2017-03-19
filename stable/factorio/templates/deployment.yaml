@@ -84,6 +84,19 @@ spec:
           mountPath: /opt/factorio/saves
         - name: mods
           mountPath: /opt/factorio/mods
+        - name: txtcollector
+          mountPath: /opt/factorio/script-output/metrics
+      - name: node-exporter
+        image: quay.io/prometheus/node-exporter:v0.13.0
+        args:
+        - -collector.textfile.directory
+        - /srv/txt_collector
+        ports:
+        - name: web
+          containerPort: 9100
+        volumeMounts:
+        - name: txtcollector
+          mountPath: /srv/txt_collector
       volumes:
       - name: saves
       {{- if .Values.persistence.savedGames.enabled }}
@@ -99,3 +112,6 @@ spec:
       {{- else }}
         emptyDir: {}
       {{- end }}
+      - name: txtcollector
+        hostPath:
+          path: /var/lib/node-exporter

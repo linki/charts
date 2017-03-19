@@ -7,13 +7,13 @@ imageTag: "0.14.22"
 # ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
   requests:
-    memory: 512Mi
-    cpu: 500m
+    cpu: 10m
+    memory: 32Mi
 
 # Most of these map to environment variables. See docker-factorio for details:
 # https://github.com/games-on-k8s/docker-factorio/blob/master/README.md#environment-variable-reference
 factorioServer:
-  name: Kubernetes Server
+  name: "promfacto test"
   description: Factorio running on Kubernetes
   port: 34197
   # Lock this server down with a password.
@@ -28,7 +28,7 @@ factorioServer:
   # Pause the server when nobody is connected?
   noAutoPause: "false"
   # You'll want to change this to NodePort if you are on AWS.
-  serviceType: LoadBalancer
+  serviceType: NodePort
 
   autosave:
     # Auto-save interval in minutes.
@@ -40,7 +40,7 @@ factorioServer:
     port: 27015
     # Empty value here enables an auto-generated password.
     password: ""
-    serviceType: LoadBalancer
+    serviceType: ClusterIP
 
 factorio:
   # Your factorio.com User/pass is needed if factorioServer.IsPublic is true.
@@ -48,15 +48,20 @@ factorio:
     username: your.username
     password: your.password
 
+  # mods:
+  # - https://github.com/ncabatoff/promfacto/releases/download/0.2.0/advanced-logistics-system_0.4.0.zip
+  # - https://github.com/ncabatoff/promfacto/releases/download/0.2.0/YARM_0.7.108.zip
+  # - https://github.com/ncabatoff/promfacto/releases/download/0.2.0/promfacto_0.2.0.zip
+
 persistence:
   ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
   ## Default: volume.alpha.kubernetes.io/storage-class: default
   ##
-  # storageClass:
+  storageClass: default
   savedGames:
     # Set this to false if you don't care to persist saved games between restarts.
     enabled: true
     size: 1Gi
   mods:
-    enabled: false
+    enabled: true
     size: 128Mi

@@ -7,6 +7,7 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+    tier: frontend
 spec:
   type: {{ .Values.factorioServer.serviceType }}
   ports:
@@ -14,5 +15,9 @@ spec:
     port: {{ .Values.factorioServer.port | int }}
     targetPort: factorio
     protocol: UDP
+    nodePort: 31327
+  - name: web
+    port: 9100
+    targetPort: 9100
   selector:
     app: {{ template "fullname" . }}
